@@ -1,8 +1,12 @@
 import './App.css';
 import React from 'react';
+import axios from 'axios';
+
+let SERVER_API = process.env.REACT_APP_API_URL;
+console.log("🚀 ~ file: App.js:6 ~ App ~ SERVER_API", SERVER_API);
+
 
 class App extends React.Component {
-
 
 //add constructor
 constructor(props){
@@ -29,16 +33,29 @@ pizzaType: event.target.value
 };
 
 
-handleOnSubmit = (event) => {
+handleOnSubmit = async (event) => {
   event.preventDefault();
-  console.log("🚀 ~ file: App.js:30 ~ App ~ event", event)
+  // console.log("🚀 ~ file: App.js:30 ~ App ~ event", event);
+
+  //create a request url for our server to accept as that request object
+  //http://localhost:3003/pizza?pizzatype=Chicago%20Pizza
+  let url = `${SERVER_API}/pizza?pizzatype=${this.state.pizzaType}`;
   
+  // console.log("🚀 ~ file: App.js:44 ~ App ~ url", url);
+  let pizzaData = await axios.get(url);
+  console.log("🚀 ~ file: App.js:46 ~ App ~ pizzaData", pizzaData.data);
+  
+  this.setState({
+    pizzaData: pizzaData.data,
+    error: false,
+    showPizza: true
+  });
 }
 
 render(){
   //add form to allow user to request pizza types
   // conditional render when we have state updated.
-  console.log(this.state.pizzaType); 
+  console.log(this.state.pizzaData); 
   return(
 
     <>
@@ -49,6 +66,14 @@ render(){
         </label>
         <button type="submit">Get Pizza</button>
       </form>
+
+
+    {
+      this.state.showPizza && 
+      <p>{this.state.pizzaData.pizzaType} can be found in {this.state.pizzaData.location}</p>
+    }
+
+
     </>
   );
 }
